@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
+import { useAuth } from "@/lib/auth-context";
 
 export default function TodosScreen() {
+  const { user, loading } = useAuth();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My ToDos</Text>
       <Text style={styles.subtitle}>
-        Nothing here yet — we build this next.
+        {loading ? 'Checking auth...' : user ? `Logged in: ${user.email}`: 'Not logged in'}
       </Text>
     </View>
   );
