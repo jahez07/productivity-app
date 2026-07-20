@@ -5,6 +5,7 @@ import { auth } from "@/lib/firebase";
 import { addTodo, deleteTodo, toggleTodo } from "@/lib/todos";
 import { signOut } from "firebase/auth";
 import { useState } from "react";
+import { useRouter } from "expo-router";
 import {
     ActivityIndicator,
     FlatList,
@@ -20,6 +21,7 @@ export default function TodosScreen() {
   const { todos, loading, error } = useTodos();
   const [title, setTitle] = useState("");
   const [adding, setAdding] = useState(false);
+  const router = useRouter();
 
   async function handleAdd() {
     const trimmed = title.trim();
@@ -86,6 +88,7 @@ export default function TodosScreen() {
                   console.error(e);
                 }
               }}
+              onOpen={(t) => router.push(`/todo/${t.id}`)}
             />
           )}
         />

@@ -5,9 +5,10 @@ type Props = {
   todo: Todo;
   onToggle: (todo: Todo) => void;
   onDelete: (todo: Todo) => void;
+  onOpen: (todo: Todo) => void;
 };
 
-export function TodoItem({ todo, onToggle, onDelete }: Props) {
+export function TodoItem({ todo, onToggle, onDelete, onOpen }: Props) {
   function confirmDelete() {
     Alert.alert("Delete todo?", `"${todo.title}"`, [
       { text: "Cancel", style: "cancel" },
@@ -16,18 +17,22 @@ export function TodoItem({ todo, onToggle, onDelete }: Props) {
   }
 
   return (
-    <Pressable
-      style={styles.row}
-      onPress={() => onToggle(todo)}
-      onLongPress={confirmDelete}
-    >
-      <View style={[styles.checkbox, todo.isDone && styles.checkboxDone]}>
-        {todo.isDone && <Text style={styles.check}>✓</Text>}
-      </View>
-      <Text style={[styles.title, todo.isDone && styles.titleDone]}>
-        {todo.title}
-      </Text>
-    </Pressable>
+    <View style={styles.row}>
+      <Pressable onPress={() => onToggle(todo)} hitSlop={8}>
+        <View style={[styles.checkbox, todo.isDone && styles.checkboxDone]}>
+          {todo.isDone && <Text style={styles.check}>✓</Text>}
+        </View>
+      </Pressable>
+      <Pressable
+        style={styles.titleWrap}
+        onPress={() => onOpen(todo)}
+        onLongPress={confirmDelete}
+      >
+        <Text style={[styles.title, todo.isDone && styles.titleDone]}>
+          {todo.title}
+        </Text>
+      </Pressable>
+    </View>
   );
 }
 
@@ -53,4 +58,5 @@ const styles = StyleSheet.create({
   check: { color: "#fff", fontSize: 14, fontWeight: "700" },
   title: { flex: 1, fontSize: 16 },
   titleDone: { textDecorationLine: "line-through", color: "#aaa" },
+  titleWrap: { flex: 1 },
 });

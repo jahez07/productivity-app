@@ -3,13 +3,14 @@ import { Todo, TodoInput } from "@/types";
 import {
     addDoc,
     collection,
+    deleteDoc,
+    doc,
+    getDoc,
     onSnapshot,
     orderBy,
     query,
-    where,
-    doc,
     updateDoc,
-    deleteDoc
+    where,
 } from "firebase/firestore";
 
 const todosRef = collection(db, "todos");
@@ -57,9 +58,23 @@ export function watchTodos(
 }
 
 export async function toggleTodo(id: string, isDone: boolean) {
-    await updateDoc(doc(db, 'todos', id), {isDone, updatedAt: Date.now()});
+  await updateDoc(doc(db, "todos", id), { isDone, updatedAt: Date.now() });
 }
 
 export async function deleteTodo(id: string) {
-    await deleteDoc(doc(db, 'todos', id));
+  await deleteDoc(doc(db, "todos", id));
+}
+
+export async function getTodo(id: string): Promise<Todo | null> {
+  const snap = await getDoc(doc(db, "todos", id));
+  return snap.exists() ? ({ id: snap.id, ...snap.data() } as Todo) : null;
+}
+
+export async function updateTodo(
+  id: string,
+  fields: Partial<
+    Pick<Todo, "title" | "notes" | "dueDate" | "priority" | "goalId" | "isDone">
+  >,
+) {
+  await updateDoc(doc(db, "todos", id), { ...fields, updatedAt: Date.now() });
 }
