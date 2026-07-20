@@ -1,7 +1,8 @@
+import { TodoItem } from "@/components/todo-item";
 import { useTodos } from "@/hooks/use-todos";
 import { useAuth } from "@/lib/auth-context";
 import { auth } from "@/lib/firebase";
-import { addTodo } from "@/lib/todos";
+import { addTodo, deleteTodo, toggleTodo } from "@/lib/todos";
 import { signOut } from "firebase/auth";
 import { useState } from "react";
 import {
@@ -69,9 +70,23 @@ export default function TodosScreen() {
             <Text style={styles.empty}>No todos yet. Add one above.</Text>
           }
           renderItem={({ item }) => (
-            <View style={styles.todoRow}>
-              <Text style={styles.todoTitle}>{item.title}</Text>
-            </View>
+            <TodoItem
+              todo={item}
+              onToggle={async (t) => {
+                try {
+                  await toggleTodo(t.id, !t.isDone);
+                } catch (e) {
+                  console.error(e);
+                }
+              }}
+              onDelete={async (t) => {
+                try {
+                  await deleteTodo(t.id);
+                } catch (e) {
+                  console.error(e);
+                }
+              }}
+            />
           )}
         />
       )}

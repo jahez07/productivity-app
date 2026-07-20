@@ -7,6 +7,9 @@ import {
     orderBy,
     query,
     where,
+    doc,
+    updateDoc,
+    deleteDoc
 } from "firebase/firestore";
 
 const todosRef = collection(db, "todos");
@@ -51,4 +54,12 @@ export function watchTodos(
     },
     onError,
   );
+}
+
+export async function toggleTodo(id: string, isDone: boolean) {
+    await updateDoc(doc(db, 'todos', id), {isDone, updatedAt: Date.now()});
+}
+
+export async function deleteTodo(id: string) {
+    await deleteDoc(doc(db, 'todos', id));
 }
