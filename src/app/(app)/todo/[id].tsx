@@ -1,14 +1,15 @@
 import { getTodo, updateTodo } from "@/lib/todos";
 import { Priority } from "@/types";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 
 const PRIORITIES: { label: string; value: Priority | null }[] = [
@@ -29,6 +30,7 @@ export default function TodoDetailScreen() {
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
   const [priority, setPriority] = useState<Priority | null>(null);
+  const [dueDate, setDueDate] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -42,6 +44,7 @@ export default function TodoDetailScreen() {
       setNotes(todo.notes ?? "");
       setPriority(todo.priority);
       setLoading(false);
+      setDueDate(todo.dueDate);
     })();
   }, [id]);
 
@@ -53,6 +56,7 @@ export default function TodoDetailScreen() {
         title: title.trim(),
         notes: notes.trim() ? notes.trim() : null,
         priority,
+        dueDate,
       });
       if (router.canGoBack()) {
         router.back();
@@ -64,6 +68,18 @@ export default function TodoDetailScreen() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function pickDueDate() {
+    DateTimePickerAndroid.open({
+      value: dueDate ? new Date(dueDate) : new Date(),
+      mode: "date",
+      // Fires only when the user confirms a date; cancelling does nothing.
+      // 'date' is always provided, so no gaurd needed.
+      onValueChange: (event, date) => {
+        setDueDate(date.getTime()); // epoch millis - matches our Todo type
+      },
+    });
   }
 
   if (loading)
@@ -111,6 +127,22 @@ export default function TodoDetailScreen() {
             </Text>
           </Pressable>
         ))}
+      </View>
+
+      <Text style={styles.label}>Due Date</Text>
+      <View style={styles.dueRow}>
+        <Pressable style={styles.dueBtn} onPress={pickDueDate}>
+          <Text style={styles.dueText}>
+            {dueDate
+              ? new Date(dueDate).toLocaleDateString()
+              : "Set a due date"}
+          </Text>
+        </Pressable>
+        {dueDate ? (
+          <Pressable style={styles.clearBtn} onPress={() => setDueDate(null)}>
+            <Text style={styles.clearText}>Clear</Text>
+          </Pressable>
+        ) : null}
       </View>
 
       <Pressable
@@ -166,4 +198,15 @@ const styles = StyleSheet.create({
     marginTop: 28,
   },
   saveText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  dueRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  dueBtn: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  dueText: { fontSize: 16, color: "#111" },
+  clearBtn: { paddingHorizontal: 8, paddingVertical: 8 },
+  clearText: { color: "#dc2626", fontWeight: "600" },
 });
