@@ -1,9 +1,9 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getApp, getApps, initializeApp } from "firebase/app";
-import { initializeAuth } from "firebase/auth";
-// @ts-ignore - getReactNativePersistence ships only in Firebase's React Native type defs, not the default ones
-import { getReactNativePersistence } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeAuth, getAuth } from 'firebase/auth';
+// @ts-ignore — getReactNativePersistence ships only in Firebase's React Native type defs
+import { getReactNativePersistence } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { initializeFirestore, getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -14,12 +14,25 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Gaurd against re-initializing during hot reload
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+// Auth — initializeAuth throws if already initialized (hot reload); fall back to getAuth.
+let auth;
+try {
+  auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+} catch {
+  auth = getAuth(app);
+}
 
-export const db = getFirestore(app);
+// Firestore — force long-polling to fix React Native's WebChannel transport issue
+// (fixes both "could not reach backend" and the auth token not attaching).
+// initializeFirestore throws if already started (hot reload); fall back to getFirestore.
+let db;
+try {
+  db = initializeFirestore(app, { experimentalForceLongPolling: true });
+} catch {
+  db = getFirestore(app);
+}
+
+export { auth, db };
 export default app;
