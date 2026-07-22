@@ -16,3 +16,15 @@ export type Todo = {
 // The shape we use when CREATING a todo: everything except the id,
 // because Firestore generates the id for us.
 export type TodoInput = Omit<Todo, "id">;
+
+export type Goal = {
+  id: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  targetDate: number | null;
+  createdAt: number;
+  updatedAt: number;
+};
+
+export type GoalInput = Omit<Goal, 'id'>;
