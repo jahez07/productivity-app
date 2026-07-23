@@ -88,7 +88,7 @@ export default function TodosScreen() {
                   console.error(e);
                 }
               }}
-              onOpen={(t) => router.push(`/todo/${t.id}`)}
+              onOpen={(t) => router.push(`/todos/${t.id}`)}
             />
           )}
         />

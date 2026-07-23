@@ -61,7 +61,7 @@ export default function TodoDetailScreen() {
       if (router.canGoBack()) {
         router.back();
       } else {
-        router.replace("/");
+        router.replace("/todos");
       }
     } catch (e) {
       console.error(e);
