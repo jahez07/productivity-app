@@ -1,3 +1,4 @@
+import { useGoals } from "@/hooks/use-goals";
 import { getTodo, updateTodo } from "@/lib/todos";
 import { Priority } from "@/types";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
@@ -6,6 +7,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -32,6 +34,9 @@ export default function TodoDetailScreen() {
   const [priority, setPriority] = useState<Priority | null>(null);
   const [dueDate, setDueDate] = useState<number | null>(null);
 
+  const [goalId, setGoalId] = useState<string | null>(null);
+  const { goals } = useGoals();
+
   useEffect(() => {
     (async () => {
       const todo = await getTodo(id);
@@ -45,6 +50,7 @@ export default function TodoDetailScreen() {
       setPriority(todo.priority);
       setLoading(false);
       setDueDate(todo.dueDate);
+      setGoalId(todo.goalId);
     })();
   }, [id]);
 
@@ -57,6 +63,7 @@ export default function TodoDetailScreen() {
         notes: notes.trim() ? notes.trim() : null,
         priority,
         dueDate,
+        goalId,
       });
       if (router.canGoBack()) {
         router.back();
@@ -145,6 +152,38 @@ export default function TodoDetailScreen() {
         ) : null}
       </View>
 
+      <Text style={styles.label}>Goal</Text>
+      <View
+        style={styles.goalRow}
+      >
+        <Pressable
+          style={[styles.chip, goalId === null && styles.chipActive]}
+          onPress={() => setGoalId(null)}
+        >
+          <Text
+            style={[styles.chipText, goalId === null && styles.chipTextActive]}
+          >
+            None
+          </Text>
+        </Pressable>
+        {goals.map((g) => (
+          <Pressable
+            key={g.id}
+            style={[styles.chip, goalId === g.id && styles.chipActive]}
+            onPress={() => setGoalId(g.id)}
+          >
+            <Text
+              style={[
+                styles.chipText,
+                goalId === g.id && styles.chipTextActive,
+              ]}
+            >
+              {g.title}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
       <Pressable
         style={[styles.saveBtn, saving && { opacity: 0.6 }]}
         onPress={handleSave}
@@ -180,6 +219,7 @@ const styles = StyleSheet.create({
   },
   notes: { minHeight: 80, textAlignVertical: "top" },
   priorityRow: { flexDirection: "row", gap: 8 },
+  goalRow: {flexDirection: "column", gap: 4},
   chip: {
     paddingVertical: 8,
     paddingHorizontal: 14,
@@ -209,4 +249,5 @@ const styles = StyleSheet.create({
   dueText: { fontSize: 16, color: "#111" },
   clearBtn: { paddingHorizontal: 8, paddingVertical: 8 },
   clearText: { color: "#dc2626", fontWeight: "600" },
+  chipScroll: { gap: 8, paddingVertical: 4 },
 });
