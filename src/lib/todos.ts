@@ -1,16 +1,16 @@
 import { db } from "@/lib/firebase";
 import { Todo, TodoInput } from "@/types";
 import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDoc,
-    onSnapshot,
-    orderBy,
-    query,
-    updateDoc,
-    where,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 
 const todosRef = collection(db, "todos");
@@ -77,4 +77,22 @@ export async function updateTodo(
   >,
 ) {
   await updateDoc(doc(db, "todos", id), { ...fields, updatedAt: Date.now() });
+}
+
+export function watchTodosForGoal(
+  goalId: string,
+  onChange: (todos: Todo[]) => void,
+  onError: (e: Error) => void,
+) {
+  const q = query(
+    todosRef,
+    where("goalId", "==", goalId),
+    orderBy("createdAt", "desc"),
+  );
+  return onSnapshot(
+    q,
+    (snapshot) =>
+      onChange(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Todo)),
+    onError,
+  );
 }
