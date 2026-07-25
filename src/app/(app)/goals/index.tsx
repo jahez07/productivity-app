@@ -4,12 +4,14 @@ import { useAuth } from '@/lib/auth-context';
 import { useGoals } from '@/hooks/use-goals';
 import { addGoal, deleteGoals } from '@/lib/goals';
 import { GoalItem } from '@/components/goal-item';
+import { useRouter } from 'expo-router';
 
 export default function GoalsScreen() {
   const { user } = useAuth();
   const { goals, loading, error } = useGoals();
   const [title, setTitle] = useState('');
   const [adding, setAdding] = useState(false);
+  const router = useRouter();
 
   async function handleAdd() {
     const trimmed = title.trim();
@@ -53,6 +55,7 @@ export default function GoalsScreen() {
           renderItem={({ item }) => (
             <GoalItem
               goal={item}
+              onOpen={(g) => router.push({pathname: '/goals/[id]', params: {id: g.id}})}
               onDelete={async (g) => { try { await deleteGoals(g.id); } catch (e) { console.error(e); } }}
             />
           )}
