@@ -3,10 +3,11 @@ import { Alert, Pressable, StyleSheet, Text } from "react-native";
 
 type Props = {
   goal: Goal;
+  onOpen: (goal: Goal) => void;
   onDelete: (goal: Goal) => void;
 };
 
-export function GoalItem({ goal, onDelete }: Props) {
+export function GoalItem({ goal, onOpen, onDelete }: Props) {
   function confirmDelete() {
     Alert.alert("Delete goal?", `"${goal.title}"`, [
       { text: "Cancel", style: "cancel" },
@@ -15,7 +16,11 @@ export function GoalItem({ goal, onDelete }: Props) {
   }
 
   return (
-    <Pressable style={styles.row} onLongPress={confirmDelete}>
+    <Pressable
+      style={styles.row}
+      onPress={() => onOpen(goal)}
+      onLongPress={confirmDelete}
+    >
       <Text style={styles.title}>{goal.title}</Text>
     </Pressable>
   );
