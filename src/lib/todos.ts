@@ -80,12 +80,14 @@ export async function updateTodo(
 }
 
 export function watchTodosForGoal(
+  userId: string,
   goalId: string,
   onChange: (todos: Todo[]) => void,
   onError: (e: Error) => void,
 ) {
   const q = query(
     todosRef,
+    where("userId", "==", userId),
     where("goalId", "==", goalId),
     orderBy("createdAt", "desc"),
   );
