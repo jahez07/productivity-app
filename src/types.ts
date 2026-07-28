@@ -27,4 +27,40 @@ export type Goal = {
   updatedAt: number;
 };
 
-export type GoalInput = Omit<Goal, 'id'>;
+export type GoalInput = Omit<Goal, "id">;
+
+export type Account = {
+  id: string;
+  userId: string;
+  name: string;
+  currency: string;
+  startingBalance: number;
+  createdAt: number;
+  updatedAt: number;
+};
+
+export type ExpenseCategory =
+  | "Food & Dining"
+  | "Groceries"
+  | "Snacks"
+  | "Transport"
+  | "Entertainment"
+  | "Shopping"
+  | "Health"
+  | "Gifts"
+  | "Family";
+
+export type TransactionType = "expense" | "deepest";
+
+export type Transaction = {
+  id: string;
+  userId: string;
+  accountId: string;
+  type: TransactionType;
+  amount: number;
+  category: ExpenseCategory | null;
+  date: number;
+  note: string | null;
+  createdAt: number;
+  updateAt: number;
+};
