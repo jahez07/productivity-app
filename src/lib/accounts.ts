@@ -1,18 +1,18 @@
 import { db } from "@/lib/firebase";
 import { Account } from "@/types";
 import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDoc,
-    getDocs,
-    onSnapshot,
-    orderBy,
-    query,
-    updateDoc,
-    where,
-    writeBatch,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  updateDoc,
+  where,
+  writeBatch,
 } from "firebase/firestore";
 
 const accountsRef = collection(db, "accounts");
@@ -21,17 +21,18 @@ export async function addAccount(
   userId: string,
   name: string,
   currency: string,
-  startingBalanace: number,
+  startingBalance: number,
 ) {
   const now = Date.now();
-  await addDoc(accountsRef, {
+  const newAccount: Omit<Account, "id"> = {
     userId,
     name: name.trim(),
     currency: currency.trim(),
-    startingBalanace,
+    startingBalance,
     createdAt: now,
     updatedAt: now,
-  });
+  };
+  await addDoc(accountsRef, newAccount);
 }
 
 export function watchAccounts(
