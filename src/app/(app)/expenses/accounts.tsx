@@ -4,7 +4,13 @@ import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    StyleSheet
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 
 export default function AccountScreen() {
@@ -34,7 +40,67 @@ export default function AccountScreen() {
       setSaving(false);
     }
   }
-  return ()
+  return (
+    <View style={styles.container}>
+      <View style={styles.form}>
+        <TextInput
+          style={styles.input}
+          placeholder="Account name (e.g. Emirates NBD)"
+          value={name}
+          onChangeText={setName}
+        />
+        <View style={styles.row}>
+          <TextInput
+            style={[styles.input, styles.flex1]}
+            placeholder="Currency"
+            value={currency}
+            onChangeText={setCurrency}
+            autoCapitalize="characters"
+          />
+          <TextInput
+            style={[styles.input, styles.flex1]}
+            placeholder="Starting balance"
+            value={balance}
+            onChangeText={setBalance}
+            keyboardType="decimal-pad"
+          />
+        </View>
+        <Pressable style={styles.addBtn} onPress={handleAdd} disabled={saving}>
+          {saving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.addBtnText}>Add account</Text>
+          )}
+        </Pressable>
+      </View>
+
+      {loading ? (
+        <ActivityIndicator style={{ marginTop: 24 }} />
+      ) : (
+        <FlatList
+          data={accounts}
+          keyExtractor={(item) => item.id}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No accounts yet. Add one above</Text>
+          }
+          renderItem={({ item }) => (
+            <Pressable
+              style={styles.accountRow}
+              onPress={() =>
+                router.push({
+                  pathname: "/expenses/account/[id]",
+                  params: { id: item.id },
+                })
+              }
+            >
+              <Text style={styles.accountName}>{item.name}</Text>
+              <Text style={styles.accountMeta}>{item.currency}</Text>
+            </Pressable>
+          )}
+        />
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
